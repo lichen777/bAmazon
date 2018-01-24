@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Amazon-like storefront with MySQL",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lichen777/bAmazon.git"
+  },
+  "keywords": [
+    "MySQL",
+    "NodeJS",
+    "inquirer"
+  ],
+  "author": "Chen Li",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lichen777/bAmazon/issues"
+  },
+  "homepage": "https://github.com/lichen777/bAmazon#readme",
+  "dependencies": {
+    "inquirer": "^5.0.1",
+    "mysql": "^2.15.0"
+  }
+}
