@@ -11,8 +11,9 @@ class Product {
       return console.log("Insufficient quantity!");
     }
     var cost = this.price * orderQty;
-    console.log("You have ordered " + this.name + ". Total Cost: " + cost);
+    console.log("You have ordered " + orderQty + " x " + this.name + ". Total Cost: $" + cost);
     var newQty = this.qty - orderQty;
+    this.qty = newQty;
     return newQty;
   }
 }
