@@ -18,8 +18,8 @@ class Store{
   }
   initialize(){
     connection.query("SELECT * FROM products",function(err, res) {
-      console.log(this.productIdList);
-      console.log(this.productList);
+      this.productList = [];
+      this.productIdList = [];
       var table = new Table(
         {
           head: ["Item ID", "Product", "Department", "Unit Price", "Stock Qty"],
