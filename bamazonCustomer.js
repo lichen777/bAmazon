@@ -1,4 +1,6 @@
-var mysql      = require('mysql');
+var mysql = require('mysql');
+var Table = require('cli-table');
+var inquirer = require('inquirer');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -7,24 +9,7 @@ var connection = mysql.createConnection({
   database : 'bamazon'
 });
 
-function updateDB(itemId, qty){
-  connection.connect(function(err) {
-    if (err) throw err;
-    //console.log("connected as id " + connection.threadId);
+var Store = require('./Store');
 
-    connection.query("UPDATE products SET ? WHERE ?",
-    [{
-      stock_quantity = qty
-    }
-    ,
-    {
-      item_id = itemId
-    }],
-    function(err, res) {
-      //console.log(res.affectedRows + " order placed!\n");
-      console.log("-----------------------------------");
-    });
-
-    connection.end();
-  };
-}
+var newStore = new Store();
+newStore.initialize();
