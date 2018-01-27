@@ -27,13 +27,12 @@ const initialize = function(){
       table.push(
         [res[i].item_id,res[i].product_name, res[i].department_name, "$" + res[i].price, res[i].stock_quantity]
       )
-      productIdList.push(res[i].item_id);
+      productIdList.push(res[i].item_id.toString());
       var product = new Product(res[i].item_id,res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity);
       productList.push(product);
     }
     console.log(table.toString());
   });
-  //connection.end();
 }
 
 const queryAllProduct = function(){
@@ -50,7 +49,7 @@ const queryAllProduct = function(){
       )
     }
     console.log(table.toString());
-    connection.end();
+    //connection.end();
   });
 }
 
@@ -63,15 +62,62 @@ const orderProduct = function(itemId, qty) {
     function(err, res) {
       if(err) throw err;
       console.log("Order is placed!\n");
-      //connection.end();
+      connection.end();
     });  
+  } else {
+    console.log("product that you want to order doesn't exist.");
   }
 }
 
-initialize();
-setTimeout(function(){
-  orderProduct(3, 2);
-}, 50);
-setTimeout(function(){
-  queryAllProduct();
-}, 50);
+var beginning = {
+  type: 'confirm',
+  name: 'start',
+  message: 'Welcome to BAMAZON Store. Ready for shopping?',
+  default: true
+};
+
+var questions = [{
+  type: 'list',
+  name: 'product',
+  message: 'Select a product to buy',
+  choices: ['1','2','3','4','5','6','7','8','9','10']
+},
+{
+  type: 'input',
+  name: 'qty',
+  message: 'How many do you want to buy?',
+  validate: function(value) {
+    var valid = !isNaN(parseFloat(value));
+    return valid || 'Please enter a number';
+  },
+  filter: Number
+}]
+
+var followUp = {
+  type: 'confirm',
+  name: 'again',
+  message: "Don't you want more?",
+  default: true
+}
+
+var shopping = function(){
+  inquirer.prompt(beginning).then(answers => {
+    if(answers.start){
+      initialize();
+      inquirer.prompt(questions).then(answers => {
+        orderProduct(answers.product, parseInt(answers.qty));
+        inquirer.prompt(followUp).then(answers => {
+          if(answers.again){
+            shopping();
+          } else {
+            return console.log("See Ya Soon!");
+          }
+        });
+      });
+    } else {
+      console.log("See Ya Soon!")
+    }
+  })
+}
+
+shopping();
