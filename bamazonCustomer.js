@@ -2,11 +2,12 @@ var mysql = require('mysql');
 var Table = require('cli-table');
 var inquirer = require('inquirer');
 
-var connection = mysql.createConnection({
-  host     : '127.0.0.1',
-  user     : 'root',
-  password : 'root',
-  database : 'bamazon'
+var pool = mysql.createPool({
+  connectionLimit : 10,
+  host            : '127.0.0.1',
+  user            : 'root',
+  password        : 'root',
+  database        : 'bamazon'
 });
 
 var Product = require('./Product');
@@ -15,8 +16,7 @@ var productList = [];
 var productIdList = [];
 
 const initialize = function(){
-  connection.connect();
-  connection.query("SELECT * FROM products",function(err, res) {
+  pool.query("SELECT * FROM products",function(err, res) {
     var table = new Table(
       {
         head: ["Item ID", "Product", "Department", "Unit Price", "Stock Qty"],
@@ -31,12 +31,12 @@ const initialize = function(){
       var product = new Product(res[i].item_id,res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity);
       productList.push(product);
     }
-    console.log(table.toString());
+    console.log("\n" + table.toString());
   });
 }
 
 const queryAllProduct = function(){
-  connection.query("SELECT * FROM products",function(err, res) {
+  pool.query("SELECT * FROM products",function(err, res) {
     var table = new Table(
       {
         head: ["Item ID", "Product", "Department", "Unit Price", "Stock Qty"],
@@ -48,8 +48,7 @@ const queryAllProduct = function(){
         [res[i].item_id,res[i].product_name, res[i].department_name, "$" + res[i].price, res[i].stock_quantity]
       )
     }
-    console.log(table.toString());
-    //connection.end();
+    console.log("\n" + table.toString());
   });
 }
 
@@ -57,12 +56,11 @@ const orderProduct = function(itemId, qty) {
   var index = productIdList.indexOf(itemId);
   if (index !== -1) {
     var newQty = productList[index].order(qty);
-    connection.query("UPDATE products SET ? WHERE ?",
+    pool.query("UPDATE products SET ? WHERE ?",
     [{stock_quantity : newQty}, {item_id : itemId}],
     function(err, res) {
       if(err) throw err;
       console.log("Order is placed!\n");
-      connection.end();
     });  
   } else {
     console.log("product that you want to order doesn't exist.");
@@ -77,10 +75,9 @@ var beginning = {
 };
 
 var questions = [{
-  type: 'list',
+  type: 'input',
   name: 'product',
-  message: 'Select a product to buy',
-  choices: ['1','2','3','4','5','6','7','8','9','10']
+  message: 'Select a product to buy (Enter an Item ID)',
 },
 {
   type: 'input',
@@ -93,29 +90,39 @@ var questions = [{
   filter: Number
 }]
 
-var followUp = {
+var followUpQuestion = {
   type: 'confirm',
   name: 'again',
   message: "Don't you want more?",
   default: true
 }
 
+var followUp = function(){
+  inquirer.prompt(followUpQuestion).then(answers => {
+    if(answers.again){
+      queryAllProduct();
+      setTimeout(function(){shoppingCart();}, 100);
+    } else {
+      console.log("See Ya Soon!");
+      process.exit();
+    }
+  });
+}
+
+var shoppingCart = function(){
+  inquirer.prompt(questions).then(answers => {
+    orderProduct(answers.product, parseInt(answers.qty));
+    setTimeout(function(){followUp();}, 100);
+  });
+}
+
 var shopping = function(){
   inquirer.prompt(beginning).then(answers => {
     if(answers.start){
       initialize();
-      inquirer.prompt(questions).then(answers => {
-        orderProduct(answers.product, parseInt(answers.qty));
-        inquirer.prompt(followUp).then(answers => {
-          if(answers.again){
-            shopping();
-          } else {
-            return console.log("See Ya Soon!");
-          }
-        });
-      });
+      setTimeout(function(){shoppingCart();}, 100);
     } else {
-      console.log("See Ya Soon!")
+      console.log("See Ya Soon!");
     }
   })
 }
