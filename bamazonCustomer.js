@@ -1,130 +1,132 @@
-var mysql = require('mysql');
-var Table = require('cli-table');
-var inquirer = require('inquirer');
+var mysql = require('mysql')
+var Table = require('cli-table')
+var inquirer = require('inquirer')
 
 var pool = mysql.createPool({
-  connectionLimit : 10,
-  host            : '127.0.0.1',
-  user            : 'root',
-  password        : 'root',
-  database        : 'bamazon'
-});
+  connectionLimit: 10,
+  host: '127.0.0.1',
+  user: 'root',
+  password: 'root',
+  database: 'bamazon'
+})
 
-var Product = require('./Product');
+var Product = require('./Product')
 
-var productList = [];
-var productIdList = [];
+var productList = []
+var productIdList = []
 
-const initialize = function(){
-  pool.query("SELECT * FROM products",function(err, res) {
+var initialize = function () {
+  pool.query('SELECT * FROM products', function (err, res) {
     var table = new Table(
       {
-        head: ["Item ID", "Product", "Department", "Unit Price", "Stock Qty"],
+        head: ['Item ID', 'Product', 'Department', 'Unit Price', 'Stock Qty'],
         chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
       }
-    );
+    )
     for (var i = 0; i < res.length; i++) {
       table.push(
-        [res[i].item_id,res[i].product_name, res[i].department_name, "$" + res[i].price, res[i].stock_quantity]
+        [res[i].item_id, res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity]
       )
-      productIdList.push(res[i].item_id.toString());
-      var product = new Product(res[i].item_id,res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity);
-      productList.push(product);
+      productIdList.push(res[i].item_id.toString())
+      var product = new Product(res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity)
+      productList.push(product)
     }
-    console.log("\n" + table.toString());
-  });
+    console.log('\n' + table.toString())
+  })
 }
 
-const queryAllProduct = function(){
-  pool.query("SELECT * FROM products",function(err, res) {
+var queryAllProduct = function () {
+  pool.query('SELECT * FROM products', function (err, res) {
     var table = new Table(
       {
-        head: ["Item ID", "Product", "Department", "Unit Price", "Stock Qty"],
+        head: ['Item ID', 'Product', 'Department', 'Unit Price', 'Stock Qty'],
         chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
       }
-    );
+    )
     for (var i = 0; i < res.length; i++) {
       table.push(
-        [res[i].item_id,res[i].product_name, res[i].department_name, "$" + res[i].price, res[i].stock_quantity]
+        [res[i].item_id, res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity]
       )
     }
-    console.log("\n" + table.toString());
-  });
+    console.log('\n' + table.toString())
+  })
 }
 
-const orderProduct = function(itemId, qty) {
-  var index = productIdList.indexOf(itemId);
+var orderProduct = function (itemId, qty) {
+  var index = productIdList.indexOf(itemId)
   if (index !== -1) {
-    var newQty = productList[index].order(qty);
-    pool.query("UPDATE products SET ? WHERE ?",
-    [{stock_quantity : newQty}, {item_id : itemId}],
-    function(err, res) {
-      if(err) throw err;
-      console.log("Order is placed!\n");
-    });  
+    var newQty = productList[index].order(qty)
+    pool.query('UPDATE products SET ? WHERE ?',
+      [{stock_quantity: newQty}, {item_id: itemId}],
+      function (err, res) {
+        if (err) throw err
+        console.log('Order is placed!\n')
+      })
   } else {
-    console.log("product that you want to order doesn't exist.");
+    console.log("product that you want to order doesn't exist.")
   }
 }
 
-var beginning = {
+const beginning = {
   type: 'confirm',
   name: 'start',
   message: 'Welcome to BAMAZON Store. Ready for shopping?',
   default: true
-};
+}
 
-var questions = [{
-  type: 'input',
-  name: 'product',
-  message: 'Select a product to buy (Enter an Item ID)',
-},
-{
-  type: 'input',
-  name: 'qty',
-  message: 'How many do you want to buy?',
-  validate: function(value) {
-    var valid = !isNaN(parseFloat(value));
-    return valid || 'Please enter a number';
+const questions = [
+  {
+    type: 'input',
+    name: 'product',
+    message: 'Select a product to buy (Enter an Item ID)'
   },
-  filter: Number
-}]
+  {
+    type: 'input',
+    name: 'qty',
+    message: 'How many do you want to buy?',
+    validate: function (value) {
+      var valid = !isNaN(parseFloat(value))
+      return valid || 'Please enter a number'
+    },
+    filter: Number
+  }
+]
 
-var followUpQuestion = {
+const followUpQuestion = {
   type: 'confirm',
   name: 'again',
   message: "Don't you want more?",
   default: true
 }
 
-var followUp = function(){
+var followUp = function () {
   inquirer.prompt(followUpQuestion).then(answers => {
-    if(answers.again){
-      queryAllProduct();
-      setTimeout(function(){shoppingCart();}, 100);
+    if (answers.again) {
+      queryAllProduct()
+      setTimeout(function () {shoppingCart();}, 100)
     } else {
-      console.log("See Ya Soon!");
-      process.exit();
-    }
-  });
-}
-
-var shoppingCart = function(){
-  inquirer.prompt(questions).then(answers => {
-    orderProduct(answers.product, parseInt(answers.qty));
-    setTimeout(function(){followUp();}, 100);
-  });
-}
-
-var shopping = function(){
-  inquirer.prompt(beginning).then(answers => {
-    if(answers.start){
-      initialize();
-      setTimeout(function(){shoppingCart();}, 100);
-    } else {
-      console.log("See Ya Soon!");
+      console.log('See Ya Soon!')
+      process.exit()
     }
   })
 }
 
-shopping();
+var shoppingCart = function () {
+  inquirer.prompt(questions).then(answers => {
+    orderProduct(answers.product, parseInt(answers.qty))
+    setTimeout(function () {followUp();}, 100)
+  })
+}
+
+var shopping = function () {
+  inquirer.prompt(beginning).then(answers => {
+    if (answers.start) {
+      initialize()
+      setTimeout(function () {shoppingCart();}, 100)
+    } else {
+      console.log('See Ya Soon!')
+    }
+  })
+}
+
+shopping()
