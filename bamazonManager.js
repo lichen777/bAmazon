@@ -38,7 +38,7 @@ var viewAll = function () {
 }
 
 var viewLowIntentory = function () {
-  pool.query('SELECT * FROM products WHERE stock_quantity < 5' , function (err, res) {
+  pool.query('SELECT * FROM products WHERE `stock_quantity` < ?', [5], function (err, res) {
     var table = new Table(
       {
         head: ['Item ID', 'Product', 'Department', 'Unit Price', 'Stock Qty'],
