@@ -119,6 +119,8 @@ const questions = [
   }
 ]
 
+var departmentList = ['Electrics', 'Home Improvements', 'Kitchen']
+
 const newProduct = [
   {
     type: 'input',
@@ -129,7 +131,7 @@ const newProduct = [
     type: 'list',
     name: 'department',
     message: 'Which Department?',
-    choices: ['Electrics', 'Home Improvements', 'Kitchen']
+    choices: departmentList
   },
   {
     type: 'input',

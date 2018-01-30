@@ -56,8 +56,9 @@ var orderProduct = function (itemId, qty) {
   var index = productIdList.indexOf(itemId)
   if (index !== -1) {
     var newQty = productList[index].order(qty)
-    pool.query('UPDATE products SET ? WHERE ?',
-      [{stock_quantity: newQty}, {item_id: itemId}],
+    var rev = qty * productList[index].price
+    pool.query('UPDATE products SET ?, `product_sale` = `product_sale` + ? WHERE ?',
+      [{stock_quantity: newQty}, rev, {item_id: itemId}],
       function (err, res) {
         if (err) throw err
         console.log('Order is placed!\n')
