@@ -56,6 +56,9 @@ var orderProduct = function (itemId, qty) {
   var index = productIdList.indexOf(itemId)
   if (index !== -1) {
     var newQty = productList[index].order(qty)
+    if (newQty === undefined) {
+      return
+    }
     var rev = qty * productList[index].price
     pool.query('UPDATE products SET ?, `product_sale` = `product_sale` + ? WHERE ?',
       [{stock_quantity: newQty}, rev, {item_id: itemId}],

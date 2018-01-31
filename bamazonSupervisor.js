@@ -34,10 +34,10 @@ var addNewDepartment = function () {
       function (err, res) {
         if (err) throw err
         console.log('New department is added\n')
+        setTimeout(function () { supervisor(); }, 100)
       }
     )
   })
-  setTimeout(function () { supervisor(); }, 100)
 }
 
 const newDepartment = [
@@ -62,7 +62,7 @@ const login = [
   {
     type: 'input',
     name: 'username',
-    message: 'Manager Login. Enter your username'
+    message: 'Supervisor Login. Enter your username'
   },
   {
     type: 'password',

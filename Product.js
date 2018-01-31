@@ -18,7 +18,7 @@ class Product {
   }
   refill (addQty) {
     var value = this.price * addQty
-    console.log('You have added ' + addQty + ' x ' + this.name + 'to Inventory. Total Resale value: $' + value)
+    console.log('You have added ' + addQty + ' x ' + this.name + ' to Inventory. Total Resale value: $' + value)
     var newQty = this.qty + addQty
     this.qty = newQty
     return newQty
