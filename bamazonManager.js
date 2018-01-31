@@ -78,7 +78,7 @@ var addNewProduct = function () {
   inquirer.prompt(newProduct).then(answers => {
     // console.log(answers)
     pool.query('INSERT INTO products SET ? ',
-      {item_id: null, product_name: answers.productName, department_name: answers.department, price: answers.price, stock_quantity: answers.qty},
+      {item_id: null, product_name: answers.productName, department_name: answers.department, price: answers.price, stock_quantity: answers.qty, product_sale: 0},
       function (err, res) {
         if (err) throw err
         console.log('New product is added\n')
@@ -87,18 +87,25 @@ var addNewProduct = function () {
   })
 }
 
-const beginning = {
-  type: 'confirm',
-  name: 'start',
-  message: 'Manager Login.',
-  default: true
-}
+const login = [
+  {
+    type: 'input',
+    name: 'username',
+    message: 'Manager Login. Enter your username'
+  },
+  {
+    type: 'password',
+    name: 'password',
+    message: 'Enter your password',
+    mask: '*'
+  }
+]
 
 const options = {
   type: 'list',
   name: 'option',
   message: 'What do you want to do next?',
-  choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product', 'Go Back']
+  choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product', 'Exit']
 }
 
 const questions = [
@@ -119,7 +126,13 @@ const questions = [
   }
 ]
 
-var departmentList = ['Electrics', 'Home Improvements', 'Kitchen']
+var departmentList = []
+
+pool.query('SELECT * FROM departments', function (err, res) {
+  for (var i = 0; i < res.length; i++) {
+    departmentList.push(res[i].department_name)
+  }
+})
 
 const newProduct = [
   {
@@ -156,24 +169,23 @@ const newProduct = [
 ]
 
 var manager = function () {
-  inquirer.prompt(beginning).then(answers => {
-    if (answers.start) {
+  inquirer.prompt(login).then(answers => {
+    if (answers.username === 'admin' && answers.password === 'admin') {
       viewAll()
-      setTimeout(function () {doYourJob();}, 100)
+      setTimeout(function () {jobs();}, 100)
     } else {
-      console.log('See Ya Soon!')
+      console.log('Login failed!')
       process.exit()
     }
   })
 }
 
-var doYourJob = function () {
+var jobs = function () {
   inquirer.prompt(options).then(answers => {
-    // console.log(answers.option)
     switch (answers.option) {
       case 'View Low Inventory':
         viewLowIntentory()
-        setTimeout(function () {doYourJob();}, 100)
+        setTimeout(function () {jobs();}, 100)
         break
       case 'Add to Inventory':
         addIntentory()
@@ -183,10 +195,11 @@ var doYourJob = function () {
         break
       case 'View Products for Sale':
         viewAll()
-        setTimeout(function () {doYourJob();}, 100)
+        setTimeout(function () {jobs();}, 100)
         break
       default:
-        manager()
+        console.log('Logged off')
+        process.exit()
         break
     }
   })

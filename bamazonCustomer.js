@@ -69,10 +69,10 @@ var orderProduct = function (itemId, qty) {
 }
 
 const beginning = {
-  type: 'confirm',
-  name: 'start',
-  message: 'Welcome to BAMAZON Store. Ready for shopping?',
-  default: true
+  type: 'input',
+  name: 'username',
+  message: 'Enter your name to start shopping.(Enter "exit" to leave)',
+  default: 'Guest'
 }
 
 const questions = [
@@ -119,9 +119,9 @@ var shoppingCart = function () {
   })
 }
 
-var shopping = function () {
+var userLogin = function () {
   inquirer.prompt(beginning).then(answers => {
-    if (answers.start) {
+    if (answers.username !== 'exit') {
       initialize()
       setTimeout(function () {shoppingCart();}, 100)
     } else {
@@ -130,4 +130,4 @@ var shopping = function () {
   })
 }
 
-shopping()
+userLogin()
