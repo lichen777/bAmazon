@@ -10,7 +10,7 @@ Demo:
 ![GIF of bamazonCustomer](./Img/bamazonCustomer.gif)
 
 ### 2. Manager View
-Manager can do the followings after authorization:
+Manager can do the followings after authorization (username and password are "admin"):
 
 1. View Products for Sale
 2. View Low Inventory
@@ -21,7 +21,7 @@ Demo:
 ![GIF of bamazon manager](./Img/bamazonManager.gif)
 
 ### 3. Supervisor View
-Supervisor can do the followings after authorization:
+Supervisor can do the followings after authorization (username and password are "admin"):
 
 1. View Product Sales by Department
 2. View the calculated profit for each department
