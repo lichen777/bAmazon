@@ -10,6 +10,11 @@
 # Generation Time: 2018-02-08 00:39:43 +0000
 # ************************************************************
 
+DROP DATABASE IF EXISTS `bamazon`;
+
+CREATE DATABASE `bamazon`;
+
+
 # Dump of table departments
 # ------------------------------------------------------------
 
